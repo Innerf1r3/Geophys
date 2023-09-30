@@ -98,7 +98,7 @@ class GravityGraphs:
         fig = plt.figure(figsize=(6, 6))
         plt.title('График второй производной потенциала')
         
-        indexes = np.array([0, 0.4 * self.grav_functions.RADIUS, 0.8 * self.grav_functions.RADIUS, self.grav_functions.RADIUS,
+        indexes = np.array([0.8 * self.grav_functions.RADIUS, self.grav_functions.RADIUS,
                             1.5 * self.grav_functions.RADIUS, 2 * self.grav_functions.RADIUS, 3 * self.grav_functions.RADIUS,
                             4 * self.grav_functions.RADIUS, 5 * self.grav_functions.RADIUS, 6 * self.grav_functions.RADIUS,
                             10 * self.grav_functions.RADIUS])
