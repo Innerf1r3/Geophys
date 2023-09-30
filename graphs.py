@@ -40,7 +40,8 @@ class GravityGraphs:
             plt.xlabel('$\\rho, тыс.км$')
             axis.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.0f}".format(x / scalex)))
         # Setting axis labels
-        plt.ylabel(ylabel + ' 1e' + str(round(np.log10(self.get_scale(m_y)))))
+        degree = -round(np.log10(self.get_scale(m_y)))
+        plt.ylabel(ylabel + '$10^{' + f'{degree}' + '}$')
 
         # Format of axis
         plt.ylim(0, m_y * 1.05)
@@ -60,6 +61,7 @@ class GravityGraphs:
 
     def plot_gravity_graphs(self):
         fig = plt.figure(figsize=(6, 6))
+        plt.title('Графики гравитационного потенциала и силы притяжения')
 
         x_axis = np.linspace(0, 10 * self.grav_functions.RADIUS, 1000)
         indexes = np.array([0, 0.4 * self.grav_functions.RADIUS, 0.8 * self.grav_functions.RADIUS, self.grav_functions.RADIUS,
@@ -77,7 +79,7 @@ class GravityGraphs:
         lines.append(self.add_graph_V(x_axis=x_axis, y_axis=self.grav_functions.DV(x_axis), annotatablex=indexes,
                                       annotatabley=self.grav_functions.DV(indexes), offset=(0, 5),
                                       measurex='THOUSAND_KILOMETER', measurey='SGS', normalizex=False,
-                                      normalizey=False, linelabel='График cилы', ylabel='F, Гал',
+                                      normalizey=True, linelabel='График cилы', ylabel='F, Гал',
                                       color='orange', is_second=True))
 
         # Drawing labels
