@@ -25,25 +25,25 @@ class GravitationalFunctions:
 
     def density(self):
         # Calculate the density function in SGS using provided R0 and M0
-        return self.M0 / (4 / 3 * self.PI * np.power(self.R0 * 1e5, 3))
+        return self.MASS / (4 / 3 * self.PI * np.power(self.RADIUS, 3))
 
     def V(self, rho):
         result = np.zeros_like(rho)
-        mask = rho < self.R0 * 1e5
-        result[mask] = 2 / 3 * self.PI * self.GRAV_CONST * self.density() * (3 * (self.R0 * 1e5) ** 2 - rho[mask] ** 2)
-        result[~mask] = 4 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.R0 * 1e5) ** 3 / rho[~mask]
+        mask = rho < self.RADIUS
+        result[mask] = 2 / 3 * self.PI * self.GRAV_CONST * self.density() * (3 * (self.RADIUS) ** 2 - rho[mask] ** 2)
+        result[~mask] = 4 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.RADIUS) ** 3 / rho[~mask]
         return result
 
     def DV(self, rho):
         result = np.zeros_like(rho)
-        mask = rho < self.R0 * 1e5
+        mask = rho < self.RADIUS
         result[mask] = 4 / 3 * self.PI * self.GRAV_CONST * self.density() * rho[mask]
-        result[~mask] = 4 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.R0 * 1e5) ** 3 / (rho[~mask]) ** 2
+        result[~mask] = 4 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.RADIUS) ** 3 / (rho[~mask]) ** 2
         return result
 
     def D2V(self, rho):
         result = np.zeros_like(rho)
-        mask = rho < self.R0 * 1e5
-        result[mask] = -4 / 3 * self.PI * self.GRAV_CONST * self.density()
-        result[~mask] = 8 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.R0 * 1e5) ** 3 / rho[~mask] ** 3
+        mask = rho < self.RADIUS
+        result[mask] = -4 / 3 * self.PI * self.GRAV_CONST * self.density() * self.MEASURES['EOTVOS']
+        result[~mask] = 8 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.RADIUS) ** 3 / rho[~mask] ** 3 * self.MEASURES['EOTVOS']
         return result
