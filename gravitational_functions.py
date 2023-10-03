@@ -47,3 +47,23 @@ class GravitationalFunctions:
         result[mask] = -4 / 3 * self.PI * self.GRAV_CONST * self.density() * self.MEASURES['EOTVOS']
         result[~mask] = 8 / 3 * self.PI * self.GRAV_CONST * self.density() * (self.RADIUS) ** 3 / rho[~mask] ** 3 * self.MEASURES['EOTVOS']
         return result
+    
+class ModelFunctions:
+    def __init__(self, R0, density, density_external, h0):
+        self.PI = np.pi
+        self.GRAV_CONST = 6.674e-8
+        self.RADIUS = R0 * 1e2
+        self.h = h0 * 1e2
+        self.density = density
+        self.density_external = density_external
+        self.delta_density = density - density_external
+        self.MASS = self.delta_density * 4/3 * self.RADIUS ** 3
+        
+    def V_derevative_for_X(self, ksi, eta, dzeta):
+        return self.GRAV_CONST * self.MASS * ksi/np.power(((dzeta + self.h) ** 2 + ksi ** 2 + eta ** 2), 1.5)
+
+    def V_derevative_for_Z(self, ksi, eta, dzeta):
+        return self.GRAV_CONST * self.MASS * (dzeta + self.h)/np.power(((dzeta + self.h) ** 2 + (ksi) ** 2 + eta ** 2), 1.5)
+    
+    def find_xlim(self, eps):
+        return np.sqrt(self.GRAV_CONST * self.MASS / eps)

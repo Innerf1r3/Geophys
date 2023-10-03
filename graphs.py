@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from gravitational_functions import GravitationalFunctions
+from gravitational_functions import ModelFunctions
 import streamlit as st
 import pandas as pd
 
@@ -18,7 +19,7 @@ class GravityGraphs:
         return 10 ** format
 
     def add_graph_V(self, x_axis, y_axis, annotatablex=[], annotatabley=[], offset=(0, 0), measurex='SGS', measurey='SGS',
-                    normalizex=False, normalizey=False, linelabel='', ylabel='', color='steelblue', is_second=False):
+                    normalizex=False, normalizey=False, linelabel='', ylabel='', xlabel = '$\\rho, тыс.км$', color='steelblue', is_second=False):
         # Getting right scales
         scalex = self.MEASURES[measurex]
         scaley = self.MEASURES[measurey]
@@ -38,7 +39,7 @@ class GravityGraphs:
             axis = plt.gca().twinx()
         else:
             axis = plt.gca()
-            plt.xlabel('$\\rho, тыс.км$')
+            plt.xlabel(xlabel)
             axis.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.0f}".format(x / scalex)))
         
         # Setting axis labels
@@ -56,13 +57,14 @@ class GravityGraphs:
         # Drawing a graph
         line, = axis.plot(x_axis, y_axis, label=linelabel, color=color)
 
-        # Drawing annotated points
-        for i in range(len(annotatablex)):
-            axis.scatter(annotatablex[i], annotatabley[i], color=color)
-            axis.annotate(f'{annotatabley[i] / scaley:.2f}', (annotatablex[i], annotatabley[i]), xytext=offset,
-                          textcoords='offset points')
-        # Returning line object for further use in legend
-        return line
+        if len(annotatablex) and len(annotatabley):
+            # Drawing annotated points
+            for i in range(len(annotatablex)):
+                axis.scatter(annotatablex[i], annotatabley[i], color=color)
+                axis.annotate(f'{annotatabley[i] / scaley:.2f}', (annotatablex[i], annotatabley[i]), xytext=offset,
+                            textcoords='offset points')
+            # Returning line object for further use in legend
+            return line
 
     def plot_gravity_graphs(self, label_offsets):
         fig = plt.figure(figsize=(6, 6))
@@ -147,5 +149,36 @@ class GravityGraphs:
         result_table = result_table[['Fraction of Radius', 'Index', 'V', 'DV', 'D2V']]
 
         return result_table
+    
+    
+    def draw_model(self, R0, density, density_external, h0): 
+        mod_func = ModelFunctions(R0, density, density_external, h0)
         
+        fig = plt.figure(figsize=(6, 6))
+        
+        eps = 1e-3
+        xlim = mod_func.find_xlim(eps)
+        x_axis = np.linspace(-xlim, xlim, 1000) 
+        
+        lines = []        
+        lines.append(self.add_graph_V(x_axis=x_axis, y_axis=mod_func.V_derevative_for_X(x_axis, 0, 0), offset=(0, 0), 
+                    measurex='SGS', measurey='SGS', normalizex=False, normalizey=False, linelabel='',
+                    ylabel='$\\frac{\\partial{V}}{\\partial{x}}, Гал $', xlabel='X, см', color='steelblue', is_second=False))
+        
+        lines.append(self.add_graph_V(x_axis=x_axis, y_axis=mod_func.V_derevative_for_Z(x_axis, 0, 0), offset=(0, 0), 
+                    measurex='SGS', measurey='SGS', normalizex=False, normalizey=False, linelabel='',
+                    ylabel='$\\frac{\\partial{V}}{\\partial{r}}, Гал $', xlabel='', color='orange', is_second=True))
+        
+        plt.ylim(-max(mod_func.V_derevative_for_Z(x_axis, 0, 0)), max(mod_func.V_derevative_for_Z(x_axis, 0, 0)))
+        
+        plt.legend()
+        
+        plt.title('Графики зависимостей $V_x(x) и V_z(x)$')
+        
+        ax = plt.gca()
+        ax.spines['bottom'].set_position('center')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        
+        st.pyplot(fig)
         
